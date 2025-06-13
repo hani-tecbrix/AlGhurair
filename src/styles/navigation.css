@@ -1,0 +1,108 @@
+/* Enhanced Bottom Navigation Styles */
+.bottom-nav {
+  --nav-height: 84px;
+  --sheet-handle-size: 4px;
+  --spring-duration: 0.6s;
+  --spring-stiffness: 300;
+}
+
+/* Safe area support */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Backdrop blur enhancement */
+.backdrop-blur-md {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Smooth scrolling for sheet content */
+.bottom-sheet-content {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Enhanced ripple effects */
+.nav-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.1;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.nav-button:active::before {
+  width: 100px;
+  height: 100px;
+}
+
+/* Gradient animations */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gradient-animated {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Focus styles for accessibility */
+.nav-button:focus-visible {
+  outline: 2px solid rgb(34, 197, 94);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bottom-nav {
+    border-top: 2px solid;
+  }
+  
+  .nav-button {
+    border: 1px solid transparent;
+  }
+  
+  .nav-button:hover,
+  .nav-button:focus {
+    border-color: currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .nav-button,
+  .bottom-sheet,
+  .gradient-animated {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .bottom-nav {
+    border-top-color: rgba(63, 63, 70, 0.5);
+  }
+}
+
+/* Print styles */
+@media print {
+  .bottom-nav,
+  .bottom-sheet {
+    display: none;
+  }
+} 
