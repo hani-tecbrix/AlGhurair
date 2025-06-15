@@ -1,5 +1,5 @@
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useRef, useEffect, useState } from 'react';
+import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import { useNavigation } from '../contexts/NavigationContext';
 import { HomeScreen } from './HomeScreen';
 import { BeneficiaryScreen } from './SendMoney/BeneficiaryScreen';
@@ -23,27 +23,15 @@ import { CardDetailsScreen } from './ManageCards/CardDetailsScreen';
 import { TransactionTrackScreen } from './TransactionTracker/TransactionTrackScreen';
 import { ComingSoonScreen } from './ComingSoonScreen';
 import { ProfileSettingsScreen } from './ProfileSettingsScreen';
-
-const screenVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? 300 : -300,
-    opacity: 0,
-  }),
-  center: {
-    zIndex: 1,
-    x: 0,
-    opacity: 1,
-  },
-  exit: (direction: number) => ({
-    zIndex: 0,
-    x: direction < 0 ? 300 : -300,
-    opacity: 0,
-  }),
-};
+import { CurrencyConverterScreen } from './CurrencyConverterScreen';
+import { PayWithQRScreen } from './PayWithQRScreen';
+import { TopUpScreen } from './TopUpScreen';
+import { TransactionHistoryScreen } from './TransactionHistoryScreen';
 
 const screenTransition = {
-  x: { type: "spring", stiffness: 300, damping: 30 },
-  opacity: { duration: 0.2 },
+  type: "tween",
+  ease: "easeInOut",
+  duration: 0.4,
 };
 
 export const ScreenManager: React.FC = () => {
@@ -52,8 +40,48 @@ export const ScreenManager: React.FC = () => {
   console.log('ScreenManager: currentScreen =', currentScreen);
   console.log('ScreenManager: screenHistory =', screenHistory);
   
-  // Determine animation direction based on navigation history
-  const direction = screenHistory.length > 1 ? 1 : -1;
+  // Track previous length to know if we pushed or popped
+  const prevLen = useRef(screenHistory.length);
+  const [direction, setDirection] = useState<1 | -1>(1);
+
+  useEffect(() => {
+    setDirection(screenHistory.length >= prevLen.current ? 1 : -1);
+    prevLen.current = screenHistory.length;
+  }, [screenHistory]);
+
+  // Determine if current screen should behave like a bottom sheet
+  const bottomSheetScreens = [
+    'add-card',
+    'edit-card',
+    'card-settings',
+    'add-transaction',
+    'edit-transaction',
+  ];
+
+  const isSheet = bottomSheetScreens.includes(currentScreen);
+
+  useEffect(() => {
+    if (isSheet) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isSheet]);
+
+  const screenVariants = {
+    enter: (dir: number) =>
+      isSheet
+        ? { y: 600, opacity: 0 }
+        : { x: dir > 0 ? 300 : -300, opacity: 0 },
+    center: { x: 0, y: 0, opacity: 1, zIndex: 1 },
+    exit: (dir: number) =>
+      isSheet
+        ? { y: 600, opacity: 0, zIndex: 0 }
+        : { x: dir < 0 ? 300 : -300, opacity: 0, zIndex: 0 },
+  };
 
   const renderScreen = (screen: string) => {
     console.log('ScreenManager: rendering screen:', screen);
@@ -115,10 +143,15 @@ export const ScreenManager: React.FC = () => {
         return <CardDetailsScreen />;
       case 'profile-settings':
         return <ProfileSettingsScreen />;
+      case 'currency-converter':
+        return <CurrencyConverterScreen />;
       case 'top-up':
+        return <TopUpScreen />;
       case 'qr-pay':
-      case 'accounts':
+        return <PayWithQRScreen />;
       case 'transaction-history':
+        return <TransactionHistoryScreen />;
+      case 'accounts':
       case 'promotions':
         return <ComingSoonScreen />;
       default:
@@ -129,6 +162,15 @@ export const ScreenManager: React.FC = () => {
 
   return (
     <AnimatePresence mode="wait" custom={direction}>
+      {isSheet && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4, ease: 'easeInOut' }}
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        />
+      )}
       <motion.div
         key={currentScreen}
         custom={direction}
@@ -137,9 +179,27 @@ export const ScreenManager: React.FC = () => {
         animate="center"
         exit="exit"
         transition={screenTransition}
-        className="inset-0"
+        className={`${
+          isSheet
+            ? 'z-50 flex flex-col justify-end'
+            : ''
+        }`}
       >
-        {renderScreen(currentScreen)}
+        <div
+          className={
+            isSheet
+              ? 'bg-white rounded-t-2xl max-h-[90vh] overflow-y-auto'
+              : ''
+          }
+        >
+          {['splash', 'login'].includes(currentScreen) ? (
+            renderScreen(currentScreen)
+          ) : (
+            <MotionConfig reducedMotion="always">
+              {renderScreen(currentScreen)}
+            </MotionConfig>
+          )}
+        </div>
       </motion.div>
     </AnimatePresence>
   );

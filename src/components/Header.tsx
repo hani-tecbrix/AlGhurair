@@ -27,7 +27,6 @@ export const Header: React.FC = () => {
           {/* Back Button / Logo */}
           <motion.div
             className="flex items-center space-x-2"
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {isSubScreen && canGoBack ? (
@@ -42,7 +41,7 @@ export const Header: React.FC = () => {
               </motion.button>
             ) : (
               <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
-                <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
                   <img src={headerLogo} alt="AGEX" className="object-contain w-full h-full" />
                 </div>
                 <div>
@@ -150,6 +149,11 @@ const getScreenTitle = (screen: string, t: (key: string) => string): string => {
     'send-money-beneficiary': t('quickActions.sendMoney'),
     'manage-cards': t('quickActions.manageCards'),
     'transaction-tracker': t('quickActions.transactionTracker'),
+    'transaction-history': 'Transaction History',
+    'qr-pay': 'Pay with QR',
+    'top-up': 'Mobile Top Up',
+    'currency-converter': 'Currency Converter',
+    'profile-settings': 'Profile Settings',
   };
 
   return titleMap[screen] || '';

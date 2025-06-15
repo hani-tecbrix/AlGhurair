@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigation } from "../contexts/NavigationContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { 
@@ -49,28 +49,28 @@ const paymentActions: BottomSheetAction[] = [
     label: "Pay Anyone",
     description: "Send money to anyone instantly",
     icon: Banknote,
-    route: "/send-money-beneficiary"
+    route: "send-money-new-beneficiary"
   },
   {
     id: "pay-bills",
     label: "Pay Bills",
     description: "Utilities, telecom, and more",
     icon: Receipt,
-    route: "/bill-payment"
+    route: "bill-payment"
   },
   {
     id: "top-up",
     label: "Top Up",
     description: "Mobile, gaming, and prepaid",
     icon: Smartphone,
-    route: "/top-up"
+    route: "top-up"
   },
   {
     id: "qr-pay",
     label: "QR Pay",
     description: "Scan and pay instantly",
     icon: QrCode,
-    route: "/qr-pay"
+    route: "qr-pay"
   }
 ];
 
@@ -80,42 +80,42 @@ const accountActions: BottomSheetAction[] = [
     label: "Transaction Tracker",
     description: "Track and manage all transactions",
     icon: BarChart3,
-    route: "/transaction-tracker"
+    route: "transaction-tracker"
   },
   {
     id: "accounts-list",
     label: "List of Accounts",
     description: "View all your accounts",
     icon: Building2,
-    route: "/accounts"
+    route: "accounts"
   },
   {
     id: "manage-cards",
     label: "Manage Cards",
     description: "Add, remove, or edit cards",
     icon: CreditCard,
-    route: "/manage-cards"
+    route: "manage-cards"
   },
   {
     id: "transaction-history",
     label: "Transaction History",
     description: "View your past transactions",
     icon: History,
-    route: "/transaction-history"
+    route: "transaction-history"
   },
   {
     id: "promotions",
     label: "Promotions",
     description: "Exclusive offers and rewards",
     icon: Gift,
-    route: "/promotions"
+    route: "promotions"
   },
   {
     id: "profile-settings",
     label: "Profile Settings",
     description: "Manage personal information & preferences",
     icon: Settings,
-    route: "/profile-settings"
+    route: "profile-settings"
   }
 ];
 
@@ -129,7 +129,6 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   
   const navItems = getNavItems(t);
   const [sheetType, setSheetType] = useState<'payments' | 'accounts' | null>(null);
-  const [dragY, setDragY] = useState(0);
 
   // Handle tab clicks
   const handleTabClick = (item: { id: string; label: string; icon: React.ElementType; hasSheet: boolean }) => {
@@ -154,12 +153,13 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
 
   // Handle action clicks
   const handleActionClick = (action: BottomSheetAction) => {
-    setShowBottomSheet(false);
-    setTimeout(() => {
-      if (action.route) {
-        navigateTo(action.route.substring(1)); // Remove leading slash
-      }
-    }, 300);
+    closeSheet();
+    if (action.route) {
+      // Add a small delay for smooth animation
+      setTimeout(() => {
+        navigateTo(action.route!);
+      }, 200);
+    }
   };
 
   // Close sheet with escape key
@@ -167,11 +167,18 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && showBottomSheet) {
         setShowBottomSheet(false);
+        setSheetType(null);
       }
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [showBottomSheet]);
+
+  // Close sheet function
+  const closeSheet = () => {
+    setShowBottomSheet(false);
+    setSheetType(null);
+  };
 
   const currentActions = sheetType === 'payments' ? paymentActions : accountActions;
   const sheetTitle = sheetType === 'payments' ? 'Payment Services' : 'Account Management';
@@ -219,7 +226,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
                 <AnimatePresence>
                   {activeTab === item.id && (
                     <motion.div
-                      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-green-400 to-green-600 rounded-full"
+                      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-lime-400 to-green-600 rounded-full"
                       layoutId="activeTab"
                       initial={{ width: 0 }}
                       animate={{ width: 48 }}
@@ -312,7 +319,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-            onClick={() => setShowBottomSheet(false)}
+            onClick={closeSheet}
           />
         )}
       </AnimatePresence>
@@ -324,16 +331,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={0.2}
-            onDragEnd={(_: any, info: PanInfo) => {
-              if (info.offset.y > 100 || info.velocity.y > 500) {
-                setShowBottomSheet(false);
-              }
-            }}
-            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-800 rounded-t-3xl shadow-xl z-50 max-w-md mx-auto"
-            style={{ y: dragY }}
+            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-800 rounded-t-3xl shadow-xl z-50 max-w-md mx-auto max-h-[85vh] flex flex-col"
             transition={{ 
               type: "spring", 
               damping: 25, 
@@ -357,7 +355,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
                     className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 rounded-xl flex items-center justify-center"
                     whileHover={{ rotate: 5 }}
                   >
-                    <Sparkles className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <Sparkles className="w-5 h-5 text-lime-600 dark:text-lime-400" />
                   </motion.div>
                   <div>
                     <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
@@ -369,7 +367,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
                   </div>
                 </div>
                 <motion.button
-                  onClick={() => setShowBottomSheet(false)}
+                  onClick={closeSheet}
                   className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-full transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -381,7 +379,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             </div>
 
             {/* Sheet Content */}
-            <div className="px-6 py-6 max-h-96 overflow-y-auto">
+            <div className="px-6 py-6 max-h-[65vh] overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 {currentActions.map((action, index) => (
                   <motion.button
@@ -399,7 +397,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
                     whileTap={{ scale: 0.98 }}
                   >
                     {/* Background Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-lime-50 to-lime-100 dark:from-lime-900/30 dark:to-lime-800/30 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300" />
                     
                     <div className="relative">
                       {/* Icon */}
@@ -407,7 +405,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
                         className="w-12 h-12 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300"
                         whileHover={{ rotate: 5 }}
                       >
-                        <action.icon className="w-6 h-6 text-green-600 dark:text-green-400" />
+                        <action.icon className="w-6 h-6 text-lime-600 dark:text-lime-400" />
                       </motion.div>
                       
                       {/* Content */}
@@ -436,7 +434,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
             {/* Sheet Footer */}
             <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-700 safe-area-bottom">
               <motion.button
-                onClick={() => setShowBottomSheet(false)}
+                onClick={closeSheet}
                 className="w-full py-3 text-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

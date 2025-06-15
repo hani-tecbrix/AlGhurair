@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { RefreshCw, TrendingUp } from "lucide-react";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -25,12 +24,17 @@ export const ExchangeRatesScreen: React.FC = () => {
     .filter(([c]) => c.toLowerCase().includes(search.toLowerCase()))
     .slice(0, 50);
 
+  const topCurrencies = [
+    { code: "USD", name: "US Dollar" },
+    { code: "EUR", name: "Euro" },
+    { code: "INR", name: "Indian Rupee" },
+    { code: "GBP", name: "British Pound" },
+    { code: "PHP", name: "Philippine Peso" },
+    { code: "PKR", name: "Pakistani Rupee" },
+  ];
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="px-4 py-6 space-y-4"
-    >
+    <div className="px-4 py-6 space-y-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -41,6 +45,32 @@ export const ExchangeRatesScreen: React.FC = () => {
           </button>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* Top Currencies Grid */}
+          <div className="grid grid-cols-3 gap-3">
+            {topCurrencies.map((c) => {
+              const value = rates[c.code];
+              return (
+                <button
+                  key={c.code}
+                  onClick={() => setSearch(c.code)}
+                  className="p-3 bg-zinc-100 dark:bg-zinc-700 rounded-xl flex flex-col items-center hover:bg-zinc-200 dark:hover:bg-zinc-600 transition min-h-[80px]"
+                >
+                  {loading ? (
+                    <div className="w-8 h-8 rounded-full bg-zinc-300 dark:bg-zinc-600 animate-pulse mb-2" />
+                  ) : (
+                    <span className="text-2xl mb-1">{flag(c.code)}</span>
+                  )}
+                  <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
+                    {c.code}
+                  </span>
+                  <span className="text-[10px] text-zinc-500 dark:text-zinc-400 tabular-nums">
+                    {loading || !value ? '—' : value.toFixed(2)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
           <Input
             placeholder="Search currency…"
             value={search}
@@ -71,6 +101,6 @@ export const ExchangeRatesScreen: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }; 

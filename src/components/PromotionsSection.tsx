@@ -3,8 +3,15 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Star, Gift, ArrowRight } from "lucide-react";
+import { useNavigation } from "../contexts/NavigationContext";
 
 export const PromotionsSection: React.FC = () => {
+  const { navigateTo } = useNavigation();
+
+  const openPromotions = () => {
+    navigateTo('promotions');
+  };
+
   return (
     <motion.div
       className="space-y-4"
@@ -17,14 +24,14 @@ export const PromotionsSection: React.FC = () => {
         <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
           Promotions
         </h3>
-        <Button variant="ghost" size="sm" className="text-green-600">
+        <Button variant="ghost" size="sm" className="text-lime-600" onClick={openPromotions}>
           View All
           <ArrowRight className="w-4 h-4 ml-1" />
         </Button>
       </div>
 
       {/* Reward Points Card */}
-      <Card className="bg-gradient-to-r from-green-600 to-lime-500 border-0 text-white overflow-hidden relative">
+      <Card className="bg-gradient-to-r from-lime-600 to-lime-500 border-0 text-white overflow-hidden relative cursor-pointer" onClick={openPromotions}>
         <CardContent className="p-6">
           {/* Background decoration */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16" />

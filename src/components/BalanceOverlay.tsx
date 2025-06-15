@@ -14,13 +14,7 @@ export const BalanceOverlay: React.FC<BalanceOverlayProps> = ({
 }) => {
   return (
     <motion.div
-      className="absolute pointer-events-none"
-      style={{ 
-        left: '19%', 
-        top: '19%', 
-        width: '264px', 
-        height: '264px'
-      }}
+      className="absolute inset-0 flex items-center justify-center pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.5 }}

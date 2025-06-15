@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
+import { useNavigation } from "../contexts/NavigationContext";
 import { 
   ArrowUpRight, 
   ArrowDownLeft, 
@@ -166,6 +167,7 @@ const formatAmount = (amount: number, currency: string, hideAmount: boolean) => 
 export const RecentActivity: React.FC = () => {
   const [showAllTransactions, setShowAllTransactions] = useState(false);
   const [hideAmounts, setHideAmounts] = useState(false);
+  const { navigateTo } = useNavigation();
   
   const displayedTransactions = showAllTransactions 
     ? mockTransactions 
@@ -174,6 +176,10 @@ export const RecentActivity: React.FC = () => {
   const handleTransactionClick = (transaction: Transaction) => {
     console.log('Transaction clicked:', transaction);
     // TODO: Navigate to transaction details
+  };
+
+  const handleShowAllClick = () => {
+    navigateTo('transaction-history');
   };
 
   return (
@@ -294,13 +300,10 @@ export const RecentActivity: React.FC = () => {
             >
               <Button
                 variant="ghost"
-                onClick={() => setShowAllTransactions(!showAllTransactions)}
+                onClick={handleShowAllClick}
                 className="w-full text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
               >
-                {showAllTransactions 
-                  ? `Show Less` 
-                  : `Show All Transactions (${mockTransactions.length})`
-                }
+                Show All Transactions ({mockTransactions.length})
               </Button>
             </motion.div>
           )}

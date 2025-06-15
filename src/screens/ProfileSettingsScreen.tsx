@@ -102,7 +102,7 @@ export const ProfileSettingsScreen: React.FC = () => {
         <Separator />
 
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-red-600">Danger Zone</h2>
+          
           <Button
             variant="destructive"
             className="w-full opacity-90 hover:opacity-100"
